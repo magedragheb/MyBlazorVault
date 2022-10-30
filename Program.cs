@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using MyBlazorVault.Areas.Identity;
 using MyBlazorVault.Data;
+using MyBlazorVault.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +23,12 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<TokenProvider>();
+
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 
-// builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddScoped<VaultService>();
 
 var app = builder.Build();
 

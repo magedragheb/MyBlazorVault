@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyBlazorVault.Data;
 
@@ -10,9 +11,10 @@ using MyBlazorVault.Data;
 namespace MyBlazorVault.Data.Migrations
 {
     [DbContext(typeof(MyVaultDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221029175442_SecretFavoriteNullable")]
+    partial class SecretFavoriteNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.10");
@@ -215,9 +217,9 @@ namespace MyBlazorVault.Data.Migrations
 
             modelBuilder.Entity("MyBlazorVault.Data.Secret", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("EncryptedPassword")
                         .IsRequired()

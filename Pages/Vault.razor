@@ -1,0 +1,67 @@
+@page "/vault"
+@using Data
+@using MyBlazorVault.Services
+@using MyBlazorVault.Components
+@inject VaultService vault
+@inject AuthenticationStateProvider provider
+@inject NavigationManager nav
+@attribute [Authorize]
+
+<PageTitle>Vault</PageTitle>
+
+<h3>My Vault</h3>
+
+@if (CreateModalVisible)
+{
+    <CreateModal OnClickClose="() => CreateModalVisible = false" />
+}
+
+<button class="btn btn-success btn-md mb-3" @onclick="() => CreateModalVisible = true">Add</button>
+
+<table class="table">
+    <thead>
+        <tr class="table-info table-sm">
+            <th scope="col">Title</th>
+            <th scope="col">User Name</th>
+            <th scope="col">Password</th>
+            <th scope="col">#</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in secrets)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.UserName</td>
+                <td>@item.EncryptedPassword</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" @onclick="(() => getSecret(item.Id))">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" @onclick="(() => getSecret(item.Id))">
+                        <i class="bi-trash-fill"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    protected Secret secret = new Secret();
+
+    protected List<Secret> secrets = new List<Secret>();
+    protected bool CreateModalVisible = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        secrets = await vault.GetUserSecrets();
+    }
+
+    protected void getSecret(int Id)
+    {
+        nav.NavigateTo($"secret/{Id}");
+    }
+
+}
