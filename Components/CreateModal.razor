@@ -1,6 +1,8 @@
 @using MyBlazorVault.Pages
+@using Blazored.FluentValidation
 @inherits Vault
 @using MyBlazorVault.Services
+@using Serilog
 @inject VaultService vault
 @inject NavigationManager uriHelper
 
@@ -13,22 +15,30 @@
                 <button type="button" class="btn-close" @onclick="() => OnClickClose.InvokeAsync(secret)"
                     aria-label="Close"></button>
             </div>
-            <EditForm Model="@secret">
+
+            <EditForm Model="@secret" OnValidSubmit="@SubmitValidForm">
+
+                <FluentValidationValidator @ref="validator" DisableAssemblyScanning="@true" />
+                <ValidationSummary />
+
                 <div class="modal-body">
                     <div class="col-md-6">
                         <label for="title" class="form-label">Title</label>
                         <InputText id="title" class="form-control" @bind-Value="secret.Title" />
+                        <ValidationMessage For="@(() => secret.Title)" />
                     </div>
 
                     <div class="col-md-6">
                         <label for="userName" class="form-label">User Name</label>
                         <InputText id="userName" class="form-control" @bind-Value="secret.UserName" />
+                        <ValidationMessage For="@(() => secret.UserName)" />
                     </div>
 
                     <div class="col-md-6">
                         <label for="password" class="form-label">Password</label>
                         <InputText id="password" type="password" class="form-control"
                             @bind-Value="secret.EncryptedPassword" />
+                        <ValidationMessage For="@(() => secret.EncryptedPassword)" />
                     </div>
 
                     <div class="form-check">
@@ -41,6 +51,7 @@
                     <div class="col-md-6">
                         <label for="notes" class="form-label">Notes</label>
                         <InputTextArea id="notes" class="form-control" @bind-Value="secret.Notes" />
+                        <ValidationMessage For="@(() => secret.Notes)" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -58,12 +69,21 @@
     [Parameter]
     public EventCallback OnClickClose { get; set; }
 
+    private FluentValidationValidator? validator = new FluentValidationValidator();
+
     private async void Save()
     {
+        Log.Debug($"Adding secret: {secret}");
         await vault.AddSecret(secret);
         await OnClickClose.InvokeAsync(secret);
+        Log.Debug($"Secret Added successfully");
         uriHelper.NavigateTo("/vault", forceLoad: true);
     }
 
+    private void SubmitValidForm()
+    {
+        validator?.Validate(options => options.IncludeRuleSets("Names"));
+        Log.Information("Form submitted Successfully");
+    }
 
 }

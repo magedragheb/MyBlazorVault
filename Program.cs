@@ -1,16 +1,21 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyBlazorVault.Areas.Identity;
 using MyBlazorVault.Data;
 using MyBlazorVault.Services;
+using RockLib.Encryption.Symmetric;
+using RockLib.Encryption.Symmetric.DependencyInjection;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
 
 builder.Services.AddDbContext<MyVaultDbContext>(options =>
     options.UseSqlite(connectionString));
@@ -30,7 +35,14 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 
 builder.Services.AddScoped<VaultService>();
 
+builder.Services.AddSymmetricCrypto()
+                .AddCredential("CQSImVlbvJMZcnrkzT3/ouW1klt6STljrDjRiBzIsSk=", SymmetricAlgorithm.Aes);
+builder.Services.AddSingleton<EncryptionService>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
