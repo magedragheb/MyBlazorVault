@@ -17,8 +17,9 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
-builder.Services.AddDbContext<MyVaultDbContext>(options =>
-    options.UseSqlite(connectionString));
+builder.Services.AddDbContext<MyVaultDbContext>(
+    options => options.UseSqlite(connectionString),
+    ServiceLifetime.Transient);
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
